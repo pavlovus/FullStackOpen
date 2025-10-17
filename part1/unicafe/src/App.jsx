@@ -2,38 +2,50 @@ import { useState } from 'react'
 
 const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>
 
-const StatisticLine = (props) => {
-  return (
-    <div>{props.text} {props.value}</div>
-  )
-}
+const StatisticLine = ({text, value}) => <div>{text} {value}</div>
 
-const Statistics = (props) => {
-  const calculateAverage = () => {
-    return (props.good - props.bad) / (props.good + props.bad + props.neutral)
-  }
+const Statistics = ({good, bad, neutral}) => {
+  const calculateAverage = () => (good - bad) / (good + bad + neutral)
 
-  const calculatePositivePecentage = () => {
-    return props.good/ (props.good + props.bad + props.neutral) * 100 + ' %'
-  }
+  const calculatePositivePecentage = () =>  (good/ (good + bad + neutral) * 100 + ' %')
 
-  if (props.good + props.bad + props.neutral === 0) {
-    return (
-      <div>
-        No feedback given
-      </div>
-    )
-  }
+  if (good + bad + neutral === 0) { return <div>No feedback given</div> }
 
   return (
-    <>
-      <StatisticLine text="good" value ={props.good} />
-      <StatisticLine text="neutral" value ={props.bad} />
-      <StatisticLine text="bad" value ={props.neutral} />
-      <StatisticLine text="all" value ={props.good + props.bad + props.neutral} />
-      <StatisticLine text="average" value ={calculateAverage()} />
-      <StatisticLine text="positive" value ={calculatePositivePecentage()} />
-    </>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <StatisticLine text='good' value={good} />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <StatisticLine text='neutral' value={neutral} />
+              </td>
+          </tr>
+          <tr>
+            <td>
+              <StatisticLine text='bad' value={bad} />
+              </td>
+          </tr>
+          <tr>
+            <td>
+              <StatisticLine text='all' value={good + bad + neutral} />
+              </td>
+          </tr>
+          <tr>
+            <td>
+              <StatisticLine text='average' value={calculateAverage()} />
+              </td>
+          </tr>
+          <tr>
+            <td>
+              <StatisticLine text='positive' value={calculatePositivePecentage()} />
+              </td>
+          </tr>
+        </tbody>
+      </table>
   )
 }
 
@@ -49,7 +61,7 @@ const App = () => {
       <Button onClick={() => setGood(good + 1)} text='good' />
       <Button onClick={() => setNeutral(neutral + 1)} text='neutral' />
       <Button onClick={() => setBad(bad + 1)} text='bad' />
-        <h1>statistics</h1>
+      <h1>statistics</h1>
       <Statistics good = {good} bad = {bad} neutral = {neutral}/>
     </div>
   )
