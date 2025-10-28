@@ -3,6 +3,7 @@ import contactService from './services/contacts'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
+import Notification from './components/Notifications'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
@@ -10,6 +11,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
   const personsToShow = persons.filter(person => person.name.toLowerCase().includes(newFilter.toLowerCase()))
+  const [message, setMessage] = useState(null)
+  const [success, setSuccess] = useState(true)
 
   useEffect(() => {
     contactService
@@ -39,6 +42,10 @@ const App = () => {
           setPersons(persons.map(person => person.name === newName ? newPerson : person))
           setNewName('')
           setNewNumber('')
+          
+          setSuccess(true)
+          setMessage(`Changed ${changedPerson.name}`)
+          setTimeout(() => {setMessage(null)}, 5000)
         })
       }
     } else if(newName === '' || newNumber === '') {
@@ -52,6 +59,10 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
+
+        setSuccess(true)
+        setMessage(`Added ${personObject.name}`)
+        setTimeout(() => {setMessage(null)}, 5000)
       })
     }
   }
@@ -64,12 +75,20 @@ const App = () => {
       .then(() => {
         setPersons(persons.filter(p => p.id !== id))
       })
+      .catch(error => {
+        setSuccess(false)
+        setMessage(`Information of '${person.name}' has already been removed from server`)
+        setTimeout(() => {setMessage(null)}, 5000)
+      
+        setPersons(persons.filter(p => p.id !== person.id))
+    })
     }
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} success={success} />
       <Filter newFilter={newFilter} handleFilterChange={handleFilterChange} />
       <h2>Add new contact</h2>
       <PersonForm addPerson = {addPerson} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
