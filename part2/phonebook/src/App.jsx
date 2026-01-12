@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react'
 import contactService from './services/contacts'
-import Persons from './components/Persons'
-import PersonForm from './components/PersonForm'
+import Contacts from './components/Contacts'
+import ContactForm from './components/ContactForm'
 import Filter from './components/Filter'
 import Notification from './components/Notifications'
 
 const App = () => {
-  const [persons, setPersons] = useState([]) 
+  const [contacts, setContacts] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
-  const personsToShow = persons.filter(person => person.name.toLowerCase().includes(newFilter.toLowerCase()))
+  const contactsToShow = contacts.filter(contact => contact.name.toLowerCase().includes(newFilter.toLowerCase()))
   const [message, setMessage] = useState(null)
   const [success, setSuccess] = useState(true)
 
@@ -18,7 +18,7 @@ const App = () => {
     contactService
     .getAll()
     .then(initialContacts => {
-      setPersons(initialContacts)
+      setContacts(initialContacts)
     })
   }, [])
 
@@ -26,61 +26,65 @@ const App = () => {
   const handleNumberChange = (event) => {setNewNumber(event.target.value)}
   const handleFilterChange = (event) => {setNewFilter(event.target.value)}
 
-  const addPerson = (event) => {
+  const addContact = (event) => {
     event.preventDefault()
 
-    if(persons.map(person => person.number).includes(newNumber)) {
-      alert(`${newNumber} is already added to phonebook`)
-    } else if(persons.map(person => person.name).includes(newName)) {
-      const person = persons.find(p => p.name === newName)
-      if(window.confirm(`${person.name} is already added to phonebook, replace the old number with the new one?`)){
-        const changedPerson = { ...person, number: newNumber }
+    if(newName === '' || newNumber === '') {
+      setSuccess(false)
+      setMessage(`Name or number cannot be empty`)
+      setTimeout(() => {setMessage(null)}, 5000)
+    }else if(contacts.map(contact => contact.number).includes(newNumber)) {
+      setSuccess(false)
+      setMessage(`${newNumber} is already added to phonebook`)
+      setTimeout(() => {setMessage(null)}, 5000)
+    } else if(contacts.map(contact => contact.name).includes(newName)) {
+      const contact = contacts.find(c => c.name === newName)
+      if(window.confirm(`${contact.name} is already added to phonebook, replace the old number with the new one?`)){
+        const changedContact = { ...contact, number: newNumber }
 
         contactService
-        .update(person.id, changedPerson)
-        .then(newPerson => {
-          setPersons(persons.map(person => person.name === newName ? newPerson : person))
+        .update(contact.id, changedContact)
+        .then(newContact => {
+          setContacts(contacts.map(contact => contact.name === newName ? newContact : contact))
           setNewName('')
           setNewNumber('')
           
           setSuccess(true)
-          setMessage(`Changed ${changedPerson.name}`)
+          setMessage(`Changed ${changedContact.name}`)
           setTimeout(() => {setMessage(null)}, 5000)
         })
       }
-    } else if(newName === '' || newNumber === '') {
-      alert(`Name or number cannot be empty`)
     } else {
-      const personObject = {name: newName, number: newNumber}
+      const contactObject = {name: newName, number: newNumber}
 
       contactService
-      .create(personObject)
-      .then(returnedPerson => {
-        setPersons(persons.concat(returnedPerson))
+      .create(contactObject)
+      .then(returnedContact => {
+        setContacts(contacts.concat(returnedContact))
         setNewName('')
         setNewNumber('')
 
         setSuccess(true)
-        setMessage(`Added ${personObject.name}`)
+        setMessage(`Added ${contactObject.name}`)
         setTimeout(() => {setMessage(null)}, 5000)
       })
     }
   }
 
-  const deletePerson = id => {
-    const person = persons.find(p => p.id === id)
-    if(window.confirm(`Delete ${person.name}?`)) {
+  const deleteContact = id => {
+    const contact = contacts.find(c => c.id === id)
+    if(window.confirm(`Delete ${contact.name}?`)) {
       contactService
       .deleteContact(id)
       .then(() => {
-        setPersons(persons.filter(p => p.id !== id))
+        setContacts(contacts.filter(c => c.id !== id))
       })
       .catch(error => {
         setSuccess(false)
-        setMessage(`Information of '${person.name}' has already been removed from server`)
+        setMessage(`Information of '${contact.name}' has already been removed from server`)
         setTimeout(() => {setMessage(null)}, 5000)
-      
-        setPersons(persons.filter(p => p.id !== person.id))
+
+        setContacts(contacts.filter(c => c.id !== contact.id))
     })
     }
   }
@@ -91,9 +95,9 @@ const App = () => {
       <Notification message={message} success={success} />
       <Filter newFilter={newFilter} handleFilterChange={handleFilterChange} />
       <h2>Add new contact</h2>
-      <PersonForm addPerson = {addPerson} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
+      <ContactForm addContact={addContact} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} deletPerson={deletePerson} />
+      <Contacts contacts={contactsToShow} deleteContact={deleteContact} />
     </div>
   )
 }
