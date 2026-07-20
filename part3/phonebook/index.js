@@ -1,6 +1,8 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
+const Person = require('./models/contact')
 
 morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
 
@@ -32,25 +34,24 @@ let contacts = [
 ]
 
 app.get('/api/persons', (request, response) => {
-  response.json(contacts)
+  Person.find({}).then(contacts => {
+    response.json(contacts)
+  })
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    const contact = contacts.find(c => c.id === id)
-    if (contact) {
-        response.json(contact)
-    } else {
-        response.status(404).send({ error: 'Contact not found' })
-    }
+    Person.findById(request.params.id).then(contact => {
+      response.json(contact)
+  })
 })
 
 app.get('/api/info', (request, response) => {
-  const info = `
-    Phonebook has info for ${contacts.length} people\n
-    ${new Date()}
-  `
-  response.send(info)
+  Person.countDocuments({}).then(count => {
+    response.send(`
+      Phonebook has info for ${count} people
+      ${new Date()}
+    `)
+  })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -68,18 +69,11 @@ app.post('/api/persons', (request, response) => {
         return response.status(400).json({ error: 'Name and number are required' })
     }
 
-    if (contacts.find(c => c.name === name)) {
-        return response.status(400).json({ error: 'Name must be unique' })
-    }
+    const newContact = new Person({ name, number })
 
-    const newContact = {
-        id: generateId(),
-        name,
-        number
-    }
-
-    contacts = contacts.concat(newContact)
-    response.status(201).json(newContact)
+    newContact.save().then(savedContact => {
+      response.json(savedContact)
+    })
 })
 
 const PORT = process.env.PORT || 3001
