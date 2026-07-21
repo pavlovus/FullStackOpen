@@ -53,6 +53,11 @@ const App = () => {
           setMessage(`Changed ${changedContact.name}`)
           setTimeout(() => {setMessage(null)}, 5000)
         })
+        .catch(error => {
+          setSuccess(false)
+          setMessage(error.response.data.error)
+          setTimeout(() => { setMessage(null) }, 5000)
+        })
       }
     } else {
       const contactObject = {name: newName, number: newNumber}
@@ -67,6 +72,11 @@ const App = () => {
         setSuccess(true)
         setMessage(`Added ${contactObject.name}`)
         setTimeout(() => {setMessage(null)}, 5000)
+      })
+      .catch(error => {
+        setSuccess(false)
+        setMessage(error.response.data.error)
+        setTimeout(() => { setErrorMessage(null) }, 5000)
       })
     }
   }
