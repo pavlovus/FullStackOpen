@@ -7,6 +7,7 @@ const helper = require('./test_helper')
 const Note = require('../models/note')
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 const api = supertest(app)
 
@@ -71,6 +72,7 @@ describe('when there is initially some notes saved and one user in db', () => {
     test('succeeds with valid data', async () => {
       const usersAtStart = await helper.usersInDb()
       const user = usersAtStart[0]
+      const token = jwt.sign({ username: user.username, id: user.id }, process.env.SECRET)
 
       const newNote = {
         content: 'async/await simplifies making async calls',
@@ -80,6 +82,7 @@ describe('when there is initially some notes saved and one user in db', () => {
 
       await api
         .post('/api/notes')
+        .set('Authorization', `Bearer ${token}`)
         .send(newNote)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -92,9 +95,26 @@ describe('when there is initially some notes saved and one user in db', () => {
     })
 
     test('fails with status code 400 if data invalid', async () => {
-      const newNote = { important: true }
+      const usersAtStart = await helper.usersInDb()
+      const user = usersAtStart[0]
+      const token = jwt.sign({ username: user.username, id: user.id }, process.env.SECRET)
 
-      await api.post('/api/notes').send(newNote).expect(400)
+      const newNote = { important: true, userId: user.id }
+
+      await api.post('/api/notes').set('Authorization', `Bearer ${token}`).send(newNote).expect(400)
+
+      const notesAtEnd = await helper.notesInDb()
+
+      assert.strictEqual(notesAtEnd.length, helper.initialNotes.length)
+    })
+
+    test('fails with status code 401 if user is unauthorized', async () => {
+      const usersAtStart = await helper.usersInDb()
+      const user = usersAtStart[0]
+
+      const newNote = { content: 'New note', important: true, userId: user.id }
+
+      await api.post('/api/notes').send(newNote).expect(401)
 
       const notesAtEnd = await helper.notesInDb()
 
