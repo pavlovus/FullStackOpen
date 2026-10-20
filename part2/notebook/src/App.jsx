@@ -21,10 +21,10 @@ const App = () => {
   useEffect(() => {
     console.log('effect')
     noteService
-    .getAll()
-    .then(initialNotes => {
-      setNotes(initialNotes)
-    })
+      .getAll()
+      .then(initialNotes => {
+        setNotes(initialNotes)
+      })
   }, [])
   console.log('render', notes.length, 'notes')
 
@@ -50,20 +50,20 @@ const App = () => {
       }, 5000)
     }
   }
-  
+
   const addNote = (noteObject) => {
     noteFormRef.current.toggleVisibility()
     noteService
-    .create(noteObject)
-    .then(newNote => {
-      setNotes(notes.concat(newNote))
-    })
-    .catch(error => {
-      setErrorMessage(error.response.data.error)
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-    })
+      .create(noteObject)
+      .then(newNote => {
+        setNotes(notes.concat(newNote))
+      })
+      .catch(error => {
+        setErrorMessage(error.response.data.error)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      })
   }
 
   const toggleImportanceOf = id => {
@@ -71,20 +71,20 @@ const App = () => {
     const changedNote = { ...note, important: !note.important }
 
     noteService
-    .update(id, changedNote)
-    .then(newNote => {
-      setNotes(notes.map(note => note.id === id ? newNote : note))
-    })
-    .catch(() => {
-      setErrorMessage(`Note '${note.content}' was already removed from server`)
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-      
-      setNotes(notes.filter(n => n.id !== id))
-    })
+      .update(id, changedNote)
+      .then(newNote => {
+        setNotes(notes.map(note => note.id === id ? newNote : note))
+      })
+      .catch(() => {
+        setErrorMessage(`Note '${note.content}' was already removed from server`)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+
+        setNotes(notes.filter(n => n.id !== id))
+      })
   }
-  
+
   const notesToShow = showAll ? notes : notes.filter(note => note.important)
 
   const loginForm = () => (
@@ -116,7 +116,7 @@ const App = () => {
         <button onClick={() => setShowAll(!showAll)}> show {showAll ? 'important' : 'all'} </button>
       </div>
       <ul>
-        {notesToShow.map(note => 
+        {notesToShow.map(note =>
           <Note key={note.id} note={note} toggleImportance={() => toggleImportanceOf(note.id)} />
         )}
       </ul>
