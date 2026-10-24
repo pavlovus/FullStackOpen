@@ -42,6 +42,7 @@ const App = () => {
       )
 
       setUser(user)
+      blogService.setToken(user.token)
 
       setMessage('login successful')
       setSuccess(true)
@@ -72,8 +73,7 @@ const App = () => {
     try {
       const newBlog = await blogService.create(blog)
       blogFormRef.current.toggleVisibility()
-      setBlogs(blogs.concat(newBlog))
-
+      setBlogs(blogs.concat({ ...newBlog, user }))
       setMessage(`a new blog '${newBlog.title}' by ${newBlog.author} added`)
       setSuccess(true)
       setTimeout(() => {
