@@ -13,10 +13,12 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "build:ui": "rm -rf dist && cd ../../part2/notebook && npm run build && cp -r dist ../../part3/notebook",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+    "start:test": "cross-env NODE_ENV=test node --watch index.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
