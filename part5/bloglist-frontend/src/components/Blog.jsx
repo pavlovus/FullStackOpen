@@ -1,45 +1,27 @@
-import { useState } from 'react'
-
 const Blog = ({ blog, user, handleLike, handleRemove }) => {
-  const [visible, setVisible] = useState(false)
-
-  const hideWhenVisible = { display: visible ? 'none' : '' }
-  const showWhenVisible = { display: visible ? '' : 'none' }
-
-  const blogStyle = {
-    padding: 10,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
-  }
-
-  const toggleVisibility = () => { setVisible(!visible) }
+  if (!blog) {  return null }
 
   return (
-    <div style={blogStyle}>
+    <div>
       <div>
-        <div className='blogTitle'>{blog.title}</div>
+        <h1 className='blogTitle'>{blog.title}</h1>
         <div className='blogAuthor'>{blog.author}</div>
       </div>
-      <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility} className='viewButton'> view </button>
-      </div>
-      <div style={showWhenVisible}>
-        <a href={blog.url} className='blogUrl'>{blog.url}</a>
-        <div>
-          <span className='blogLikes'> likes {blog.likes} </span>
+      <a href={blog.url} className='blogUrl'>{blog.url}</a>
+      <div>
+        <span className='blogLikes'> likes {blog.likes} </span>
+        {user !== null && (
           <button onClick={() => handleLike(blog)} className='blogLikeButton'> like </button>
-        </div>
-        <div className='blogUser'> {blog.user.name} </div>
-        {blog.user.id === user.id && (
+        )}
+      </div>
+      <div className='blogUser'> Added by {blog.user.name} </div>
+      {user !== null && user.id === blog.user.id && (
+        <div>
           <button onClick={() => window.confirm(`Remove blog '${blog.title}' by ${blog.author}?`) && handleRemove(blog)} className='blogRemoveButton'>
             remove
           </button>
-        )}
-        <div>
-          <button onClick={toggleVisibility}> hide </button>
         </div>
-      </div>
+      )}
     </div>
   )
 }
