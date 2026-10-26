@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route, Link, useNavigate, useMatch } from 'react-router-dom'
+import { Container, AppBar, Button, Toolbar, Typography } from '@mui/material'
 
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
@@ -8,7 +9,6 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
-import './index.css'
 import BlogForm from './components/BlogForm'
 
 const App = () => {
@@ -118,26 +118,31 @@ const App = () => {
     }
   }
 
-  const padding = { padding: 5 }
+  const style = { '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }
 
   const match = useMatch('/blogs/:id')
 
   const blog = match ? blogs.find(blog => blog.id === match.params.id) : null
 
   return (
-    <div>
-      <div>
-        <Link style={padding} to="/"> blogs </Link>
-        {user === null && (
-          <Link style={padding} to="/login"> login </Link>
-        )}
-        {user !== null && (
-          <Link style={padding} to="/create"> new blog </Link>
-        )}
-        {user !== null && (
-          <button onClick={handleLogout}> logout </button>
-        )}
-      </div>
+    <Container>
+      <AppBar position="static">
+        <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Typography variant="h6" component="h1"> Blog App </Typography>
+          <nav>
+            <Button color="inherit" component={Link} to="/" sx={style}>blogs</Button>
+            {user === null && (
+              <Button color="inherit" component={Link} to="/login" sx={style}>login</Button>
+            )}
+            {user !== null && (
+              <Button color="inherit" component={Link} to="/create" sx={style}>new blog</Button>
+            )}
+            {user !== null && (
+              <Button color="inherit" onClick={handleLogout} sx={style}>logout</Button>
+            )}
+          </nav>
+        </Toolbar>
+      </AppBar>
 
       <Notification message={message} success={success} />
 
@@ -160,7 +165,7 @@ const App = () => {
           <LoginForm login={handleLogin} />
         } />
       </Routes>
-    </div>
+    </Container>
   )
 }
 

@@ -1,19 +1,28 @@
-import { Link } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router-dom'
+import { Box, Link, List, ListItem, Typography } from '@mui/material'
 
 const BlogList = ({ blogs, user }) => {
   return (
     <>
-      <h2>blogs</h2>
+      <Typography variant='h4' component='h2' gutterBottom style={{ marginTop: '16px' }}>
+        blogs
+      </Typography>
 
-      {user && <span>{user.name} logged in</span>}
+      {user && (
+        <Typography variant='body1' component='span'>
+          {user.name} logged in
+        </Typography>
+      )}
 
-      <ul>
+      <List>
         {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
-          <li key={blog.id}>
-            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-          </li>
+          <ListItem key={blog.id} disablePadding>
+            <Link component={RouterLink} to={`/blogs/${blog.id}`} underline='hover' style={{ marginTop: '8px' }}>
+              {blog.title}
+            </Link>
+          </ListItem>
         )}
-      </ul>
+      </List>
     </>
   )
 }
